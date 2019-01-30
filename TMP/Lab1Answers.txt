@@ -1,0 +1,55 @@
+1. What are the advantages and disadvantages of each of the two scheduling policies? Also, give the advantages and disadvantages of the round robin scheduling policy originally implemented in Xinu.
+
+Exponential Distribution Scheduler:
+----------------------------------
+ADVANTAGES:
+a. If the process priorities are randomly distributed, the random nature of the distribution ensures that starvation does not occur, which is better than making the process with high priority (or similar parameter) to dominate the system.
+b. Ability to change parameters like RAND_MAX, lambda makes the scheduler mathematically tractable.
+c. Each process gets same amount of time quantum.
+
+DISADVANTAGES:
+a. Processes having the priorities in the higher end of the curve become less likely to be scheduled.
+b. No way to offset the process priority in a way to make the processes more likely to be scheduled. For example, if processes with priorities 96,97,98 only remain, its highly likely that 96 will complete its processing first, then 98 followed by 99. If there was a way to offset the priorities and priorities update to say 5,6,7; all 3 would have a fairer chance to run.
+
+Linux-like scheduler:
+--------------------
+ADVANTAGES:
+a. Lower average waiting time. Ensures all processes get a chance to run. 
+b. Higher time quantum is given to processes that are high priority (or more important); however, low priority processes are also scheduled in each epoch. 
+c. Processes which yield before their time quantum finishes and do not unnecessarily hog the system are regarded.
+
+DISADVANTAGES:
+a. In a long epoch, new processes will have to wait till the completion of the epoch
+b. Priorities are not real-time. In a long epoch, processes that undergo a change of priority (parameter for severity) will have to wait till the completion of the epoch. The scheduler can be enhanced to check the magnitude of change and epochs then can be altered/terminated accordingly.
+c. More scheduler overhead. Also, there are more context switches which leads to wastage of time & memory.
+
+
+Xinu's Round robin scheduler:
+----------------------------
+ADVANTAGES:
+a. High priority proceses scheduled first.
+b. Changes in priorities are real-time unlike linux-like scheduler.
+c. Space & time efficient. A simple queue data structure is used to organize the processes and no computation to determine next process.
+
+DISADVANTAGES:
+a. Very high turnaround time. Low priority processes may face starvation.
+b. Higher average waiting time. Processes spend more time in the ready quque.
+
+
+
+
+2. Describe the way each of the schedulers affects the NULL process.
+
+Exponential Distribution Scheduler:
+----------------------------------
+When there are no processes left in the ready queue, NULLPROC will be scheduled.
+
+Linux-like scheduler:
+--------------------
+If there are no processes in the ready queue (or epoch is over), a new epoch will be started. During the initialization of epoch, the NULLPROC will be scheduled. Preempt count will be set to QUANTUM (10 ticks).
+
+XINU default scheduler:
+----------------------
+When there are no processes left in the ready queue, NULLPROC will be scheduled.
+
+
